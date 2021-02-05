@@ -10,7 +10,8 @@ open R and install the <i>customized_MetaDE</i> package by typing
 ```
 install.packages(file.path(path_to_file,"MetaDE_1.0.5_customized_bukyung.tar.gz"), repos = NULL, type="source")
 ```
-The original MetaDE package(v.1.0.5) is avaialable at CRAN. If you want to check, Download: <a href=" https://cran.r-project.org/src/contrib/Archive/MetaDE/MetaDE_1.0.5.tar.gz/"> https://cran.r-project.org/src/contrib/Archive/MetaDE/MetaDE_1.0.5.tar.gz/</a><br>
+The original MetaDE package(v.1.0.5) is avaialable at CRAN. 
+If you want to check, Download: <a href=" https://cran.r-project.org/src/contrib/Archive/MetaDE/MetaDE_1.0.5.tar.gz/"> https://cran.r-project.org/src/contrib/Archive/MetaDE/MetaDE_1.0.5.tar.gz/</a><br>
 
 ## :paperclip: Dependency
 check Dependencies before running main analysis.
