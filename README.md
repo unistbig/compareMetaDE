@@ -51,6 +51,6 @@ run run_meta_simul.sh on shell.
 ```
 ./simulation_data_generation.sh 'working directory where Simulation_meta_analysis.R exists' 'input_directory where voom folder locate' 'output_directory'
 ```
-Meta_Res folder will be created where results will be saved.
+ Results will be saved in Meta_Res folder.
 
 ## Visualize simulation meta-analysis
