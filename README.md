@@ -16,23 +16,27 @@ If you want to check, Download: <a href=" https://cran.r-project.org/src/contrib
 ## :paperclip: Dependency
 check Dependencies before running main analysis.
 
-
- 
 * [tidyverse](https://github.com/tidyverse/tidyverse)
 * [magrittr](https://github.com/tidyverse/magrittr)
 
+### RNA-seq simulation
 * [Biobase](https://bioconductor.org/packages/Biobase)
 * [edgeR](https://bioconductor.org/packages/edgeR)
 * [limma](https://bioconductor.org/packages/limma)
 * [SimSeq](https://CRAN.R-project.org/package=SimSeq)
 
+### meta analysis
 * [metapro](https://github.com/unistbig/metapro)
 * [MetaQC](https://CRAN.R-project.org/package=MetaQC) -install archived version, 0.1.13
 * [MetaDE](https://github.com/unistbig/compareMetaDE/blob/main/MetaDE_1.0.5_customized_bukyung.tar.gz) -install customized package I uploaded
  
- 
+ ### Visualization
+* [ggplot2](https://CRAN.R-project.org/package=ggplot2)
+* [reshape2](https://cran.r-project.org/package=reshape2)
+* [ROCR](https://cran.r-project.org/package=ROCR)
+* [colortools](https://cran.r-project.org/package=colortools)
+* [RColorBrewer](https://cran.r-project.org/package=RColorBrewer)
 * [VennDiagram](https://CRAN.R-project.org/package=VennDiagram)
- 
 
 ## simulation data generation
 run simulation_data_generation.sh on shell.
