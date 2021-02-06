@@ -54,3 +54,11 @@ run run_meta_simul.sh on shell.
  Results will be saved in Meta_Res folder.
 
 ## Visualize simulation meta-analysis
+run Visualize_simulation_meta_analysis.sh on shell.
+```
+./Visualize_simulation_meta_analysis.sh 'working directory where Visualize_simulation_meta_analysis.R exists' 'input_directory where voom folder locate' 'output_directory'
+```
+ Plots will be saved in Simulation_analysis_plot folder.
+ 
+ ## Microarray data analysis
+ Will be updated soon.
