@@ -50,8 +50,8 @@ for(ind.tail in c('high', 'low')){
   MetaDE.Res[["roP_4"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=4,asymptotic = T)
   MetaDE.Res[["roP_6"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=6,asymptotic = T)
   MetaDE.Res[["roP_random"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=r_num,asymptotic = T)
-  MetaDE.Res[["REM"]]<-MetaDE.ES(ind.Res2, meta.method = "REM", tail=ind.tail)
-  MetaDE.Res[["FEM"]]<-MetaDE.ES(ind.Res2, meta.method = "FEM", tail=ind.tail)
+  MetaDE.Res[["REM"]]<-MetaDE.ES(ind.Res2, meta.method = "REM")
+  MetaDE.Res[["FEM"]]<-MetaDE.ES(ind.Res2, meta.method = "FEM")
   MetaDE.Res[["rankProd"]]<-MetaDE.Res.rankProd
   
   
