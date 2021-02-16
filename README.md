@@ -38,7 +38,8 @@ check Dependencies before running main analysis.
 * [RColorBrewer](https://cran.r-project.org/package=RColorBrewer)
 * [VennDiagram](https://CRAN.R-project.org/package=VennDiagram)
 
-## simulation data generation
+## Simualation data analysis
+### simulation data generation
 run simulation_data_generation.sh on shell.
 
 ```
@@ -46,14 +47,14 @@ run simulation_data_generation.sh on shell.
 ```
 Count and voom folders will be created after the run, data in the voom folder will be used for meta-analysis.
 
-## simulation data meta-analysis
+### simulation data meta-analysis
 run run_meta_simul.sh on shell.
 ```
 ./simulation_data_generation.sh 'working directory where Simulation_meta_analysis.R exists' 'input_directory where voom folder locate' 'output_directory'
 ```
  Results will be saved in Meta_Res folder.
 
-## Visualize simulation meta-analysis
+### Visualize simulation meta-analysis
 run Visualize_simulation_meta_analysis.sh on shell.
 ```
 ./Visualize_simulation_meta_analysis.sh 'working directory where Visualize_simulation_meta_analysis.R exists' 'input_directory where voom folder locate' 'output_directory'
@@ -61,4 +62,12 @@ run Visualize_simulation_meta_analysis.sh on shell.
  Plots will be saved in Simulation_analysis_plot folder.
  
  ## Microarray data analysis
+ ### True gene selection
+ run true_gene_selection.sh on shell.
+```
+./true_gene_selection.sh 'working directory where Visualize_simulation_meta_analysis.R exists' 'input_directory where prostate data locate' 'output_directory'
+```
+ Plots will be saved in Meta_Res_real folder.
+ 
+ 
  Will be updated soon.
