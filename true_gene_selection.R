@@ -70,7 +70,7 @@ for(ind.tail in c('high','low')){
   MetaDE.Res[["rankProd"]]<-MetaDE.Res.rankProd
   
   save(MetaDE.Res,file=file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res.RData')))
-  save(MetaDE.Res.ind,file=file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res.RData')))
+  save(MetaDE.Res.ind,file=file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res_ind.RData')))
 }
 
 truegenes<-list()
