@@ -20,41 +20,37 @@ dir.create(file.path(res_dir,'Meta_Res_real'),showWarnings = F)
 study.names<-c("Welsh","Yu","Lapointe","Varambally","Singh","Wallace","Nanni","Dhanasekaran", "Tomlins")
 prostate.raw<-MetaDE.Read(study.names,skip=rep(1,9),via="txt",matched=T,log=F)
 
-study.names<-c("Welsh","Yu","Lapointe","Varambally","Singh","Wallace")
-data.QC.raw<-list()
-for(i in 1:length(study.names)){
-  data.QC.raw[[i]]<-prostate.raw[[study.names[[i]]]]
+##################################################################################
+#9study
+prostate.merged<-MetaDE.merge(prostate.raw)
+dim(prostate.merged[[1]][[1]])
+prostate.filtered<-MetaDE.filter(prostate.merged,c(0.3,0.3))
+
+ndata=length(prostate.filtered)
+
+prostate.filtered<-MetaDE:::MetaDE.impute(prostate.filtered,y=0.3)
+
+weight=rep(1,length(prostate.filtered))
+for (wi in 1:length(weight)) {
+  weight[wi] = length(prostate.filtered[[wi]]$y)
 }
-
-names(data.QC.raw)<-study.names
-data.QC.merged<-MetaDE.merge(data.QC.raw)
-data.QC.filtered<-MetaDE.filter(data.QC.merged,c(0.2,0.2))#for study.good
-
-
-
 MetaDE.Res<-list()
 MetaDE.Res.ind<-list()
-ndata=length(data.QC.filtered)
-data.QC.filtered<-MetaDE:::MetaDE.impute(data.QC.filtered,y=0.3)
-weight=rep(1,length(data.QC.filtered))
-for (wi in 1:length(weight)) {
-  weight[wi] = length(data.QC.filtered[[wi]]$y)
-}
 
-MetaDE.Res.rankProd<-MetaDE.rawdata(data.QC.filtered,ind.method=rep("modt",ndata),meta.method=c("rankProd"),asymptotic=F, nperm = 300, metade.perm = F, na.rm = F)
-for(ind.tail in c('high','low')){
+MetaDE.Res.rankProd<-MetaDE.rawdata(prostate.filtered,ind.method=rep("modt",ndata),meta.method=c("rankProd"),asymptotic=F, nperm = 300, metade.perm = F, na.rm=F)
+
+for(ind.tail in c('high', 'low')){
   tailed=switch (ind.tail,
                  "low" = "left",
                  "high" = "right"
   )
+  #ndata=length(study.names)
   
-  
-  ndata=length(data.QC.filtered)
   
   
   # start<-Sys.time()
-  ind.Res1<-ind.analysis(data.QC.filtered,ind.method=rep("modt",ndata),nperm=300,tail=ind.tail)
-  ind.Res2<-ind.cal.ES(data.QC.filtered,paired=rep(F,ndata),nperm=300,miss.tol=0.3)
+  ind.Res1<-ind.analysis(prostate.filtered,ind.method=rep("modt",ndata),nperm=300,tail=ind.tail,miss.tol = 0.3)
+  ind.Res2<-ind.cal.ES(prostate.filtered,paired=rep(F,ndata),nperm=300,miss.tol=0.3)
   
   MetaDE.Res.ind[['ind.modt']]<-ind.Res1
   MetaDE.Res.ind[['ind.ES']]<-ind.Res2
@@ -69,138 +65,115 @@ for(ind.tail in c('high','low')){
   MetaDE.Res[["FEM"]]<-MetaDE.ES(ind.Res2, meta.method = "FEM", tail=ind.tail)
   MetaDE.Res[["rankProd"]]<-MetaDE.Res.rankProd
   
+  
+  
   save(MetaDE.Res,file=file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res.RData')))
   save(MetaDE.Res.ind,file=file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res_ind.RData')))
 }
 
-truegenes<-list()
-for(ind.tail in c('high','low')){
-  tailed=switch (ind.tail,
-                 "low" = "left",
-                 "high" = "right"
-  )
-  load(file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res.RData')))
-  FDR_tot<-c()
-  for(i in 1:length(MetaDE.Res)){
-    if(names(MetaDE.Res)[i]=="rankProd"){
-      if(ind.tail=='high'){
-        rp_temp<-as.matrix(MetaDE.Res[[i]]$FDR.down)
-        colnames(rp_temp)="rankProd"
-        FDR_tot%<>%cbind(rp_temp)
-      }else if(ind.tail=='low'){
-        rp_temp<-as.matrix(MetaDE.Res[[i]]$FDR.up)
-        colnames(rp_temp)="rankProd"
-        FDR_tot%<>%cbind(rp_temp)
-      }else{
-        stop('unexpected case')
-      }
-    }else if(names(MetaDE.Res)[i] %in% c("FEM","REM")){
-      FDR_tot%<>%cbind(MetaDE.Res[[i]]$FDR)
-    }else{
-      res_temp<-MetaDE.Res[[i]]$meta.analysis$FDR
-      if(str_detect(names(MetaDE.Res)[i],"roP")){
-        colnames(res_temp)=names(MetaDE.Res)[i]
-      }
-      FDR_tot%<>%cbind(res_temp)
-    }
-  }
-  truede<-c()
-  falsede<-c()
-  for(i in 1:length(MetaDE.Res)){
-    FDR_temp<-FDR_tot
-    FDR_temp<-FDR_temp[,-i]
-    FDR_temp<-FDR_temp[complete.cases(FDR_temp),]
-    max_FDR<-apply(FDR_temp, 1, FUN=function(x){x[order(x, decreasing=T)[3]]})
-    min_FDR<-apply(FDR_temp, 1, FUN=function(x){x[order(x)[3]]})
-    
-    truede%<>%union(rownames(FDR_temp)[max_FDR<true_gene_threshold])
-    falsede%<>%union(rownames(FDR_temp)[min_FDR>true_gene_threshold])
-  }
-  truegenes[[ind.tail]]$truede<-truede
-  truegenes[[ind.tail]]$falsede<-falsede
-}
-save(truegenes, file=paste0(res_dir,'truegenes_thr_0.01.Rdata'))
-
-# 
-# load(paste0(res_dir,'truegenes_thr1.Rdata'))
-# library(magrittr)
-# study.good<-c("Welsh","Yu","Lapointe","Varambally","Singh","Wallace")
-# study.bad<-c("Nanni","Dhanasekaran", "Tomlins")
-# rep_ind<-1
-# study.now<-list()
-# for(i in 1:(length(study.good)-1)){
-#   for(j in (i+1):length(study.good)){
-#     study.now[[rep_ind]]<-c(study.good[c(i,j)])
-#     rep_ind%<>%+1
-#   }
+# ##################################################################################
+# #6 study
+# study.names<-c("Welsh","Yu","Lapointe","Varambally","Singh","Wallace")
+# data.QC.raw<-list()
+# for(i in 1:length(study.names)){
+#   data.QC.raw[[i]]<-prostate.raw[[study.names[[i]]]]
 # }
 # 
-# #sample(prostate.resampled[[i]]$y, size=length(prostate.resampled[[i]]$y))
-# prostate.resampled<-prostate.raw
-# for(i in 1:length(prostate.resampled)){
-#   prostate.resampled[[i]]$y<-sample(prostate.resampled[[i]]$y, size=length(prostate.resampled[[i]]$y))
-# }
-# save(prostate.resampled, file=paste0(res_dir,'prostate.resampled.Rdata'))
-# #load('prostate.resampled.Rdata')
+# names(data.QC.raw)<-study.names
+# data.QC.merged<-MetaDE.merge(data.QC.raw)
+# data.QC.filtered<-MetaDE.filter(data.QC.merged,c(0.2,0.2))#for study.good
 # 
-# study.names<-c("Welsh","Yu","Lapointe","Varambally","Singh","Wallace","Nanni","Dhanasekaran", "Tomlins")
-# MetaReal<-list(high=list(), low=list())
-# MetaReal.ind<-list(high=list(), low=list())
-# for(k in 1:length(study.now)){
-#   data.QC.raw<-list()
-#   for(i in 1:length(study.names)){
-#     if(study.names[[i]] %in% study.now[[k]]){
-#       data.QC.raw[[i]]<-prostate.resampled[[study.names[i]]]
+# 
+# 
+# MetaDE.Res<-list()
+# MetaDE.Res.ind<-list()
+# ndata=length(data.QC.filtered)
+# data.QC.filtered<-MetaDE:::MetaDE.impute(data.QC.filtered,y=0.3)
+# weight=rep(1,length(data.QC.filtered))
+# for (wi in 1:length(weight)) {
+#   weight[wi] = length(data.QC.filtered[[wi]]$y)
+# }
+# 
+# MetaDE.Res.rankProd<-MetaDE.rawdata(data.QC.filtered,ind.method=rep("modt",ndata),meta.method=c("rankProd"),asymptotic=F, nperm = 300, metade.perm = F, na.rm = F)
+# for(ind.tail in c('high','low')){
+#   tailed=switch (ind.tail,
+#                  "low" = "left",
+#                  "high" = "right"
+#   )
+# 
+# 
+#   ndata=length(data.QC.filtered)
+# 
+# 
+#   # start<-Sys.time()
+#   ind.Res1<-ind.analysis(data.QC.filtered,ind.method=rep("modt",ndata),nperm=300,tail=ind.tail)
+#   ind.Res2<-ind.cal.ES(data.QC.filtered,paired=rep(F,ndata),nperm=300,miss.tol=0.3)
+# 
+#   MetaDE.Res.ind[['ind.modt']]<-ind.Res1
+#   MetaDE.Res.ind[['ind.ES']]<-ind.Res2
+#   MetaDE.Res[["Fisher"]]<-MetaDE.pvalue(ind.Res1,meta.method=c("Fisher"),asymptotic = T)
+#   MetaDE.Res[["Stouffer"]]=MetaDE.pvalue(ind.Res1,meta.method=c("Stouffer"),asymptotic = T)
+#   MetaDE.Res[["wFisher"]]=MetaDE.pvalue(ind.Res1,meta.method=c("wFisher_sora"),asymptotic = T, weight = weight)
+#   MetaDE.Res[["ordmeta"]]=MetaDE.pvalue(ind.Res1,meta.method=c("ordmeta"),asymptotic = T)
+#   MetaDE.Res[["roP_2"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=2,asymptotic = T)
+#   MetaDE.Res[["roP_4"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=4,asymptotic = T)
+#   MetaDE.Res[["roP_6"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=6,asymptotic = T)
+#   MetaDE.Res[["REM"]]<-MetaDE.ES(ind.Res2, meta.method = "REM", tail=ind.tail)
+#   MetaDE.Res[["FEM"]]<-MetaDE.ES(ind.Res2, meta.method = "FEM", tail=ind.tail)
+#   MetaDE.Res[["rankProd"]]<-MetaDE.Res.rankProd
+# 
+#   save(MetaDE.Res,file=file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res.RData')))
+#   save(MetaDE.Res.ind,file=file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res_ind.RData')))
+# }
+# 
+# 
+# ##################################################################################
+# #true gene selection
+# truegenes<-list()
+# for(ind.tail in c('high','low')){
+#   tailed=switch (ind.tail,
+#                  "low" = "left",
+#                  "high" = "right"
+#   )
+#   load(file.path(res_dir,'Meta_Res_real',paste0('Real_6study',tailed,'_tailed_Meta_Res.RData')))
+#   FDR_tot<-c()
+#   for(i in 1:length(MetaDE.Res)){
+#     if(names(MetaDE.Res)[i]=="rankProd"){
+#       if(ind.tail=='high'){
+#         rp_temp<-as.matrix(MetaDE.Res[[i]]$FDR.down)
+#         colnames(rp_temp)="rankProd"
+#         FDR_tot%<>%cbind(rp_temp)
+#       }else if(ind.tail=='low'){
+#         rp_temp<-as.matrix(MetaDE.Res[[i]]$FDR.up)
+#         colnames(rp_temp)="rankProd"
+#         FDR_tot%<>%cbind(rp_temp)
+#       }else{
+#         stop('unexpected case')
+#       }
+#     }else if(names(MetaDE.Res)[i] %in% c("FEM","REM")){
+#       FDR_tot%<>%cbind(MetaDE.Res[[i]]$FDR)
 #     }else{
-#       data.QC.raw[[i]]<-prostate.raw[[study.names[i]]]
+#       res_temp<-MetaDE.Res[[i]]$meta.analysis$FDR
+#       if(str_detect(names(MetaDE.Res)[i],"roP")){
+#         colnames(res_temp)=names(MetaDE.Res)[i]
+#       }
+#       FDR_tot%<>%cbind(res_temp)
 #     }
 #   }
-#   
-#   names(data.QC.raw)<-study.names
-#   data.QC.merged<-MetaDE.merge(data.QC.raw)
-#   
-#   #dim(data.QC.merged[[1]][[1]])
-#   # data.QC.filtered<-MetaDE.filter(data.QC.merged,c(0.2,0.2))#for study.good
-#   # dim(data.QC.filtered[[1]][[1]])
-#   
-#   
-#   
-#   data.QC.filtered<-MetaDE.filter(data.QC.merged,c(0.3,0.3))#for studyall
-#   ndata=length(data.QC.filtered)
-#   #dim(data.QC.filtered[[1]][[1]])
-#   MetaDE.Res<-list()
-#   MetaDE.Res.ind<-list()
-#   MetaDE.Res.rankProd<-MetaDE.rawdata(data.QC.filtered,ind.method=rep("modt",ndata),meta.method=c("rankProd"),asymptotic=F, nperm = 300, metade.perm = F, na.rm = F)
-#   
-#   for(ind.tail in c('high','low')){
-#     tailed=switch (ind.tail,
-#                    "low" = "left",
-#                    "high" = "right"
-#     )
+#   truede<-c()
+#   falsede<-c()
+#   for(i in 1:length(MetaDE.Res)){
+#     FDR_temp<-FDR_tot
+#     FDR_temp<-FDR_temp[,-i]
+#     FDR_temp<-FDR_temp[complete.cases(FDR_temp),]
+#     max_FDR<-apply(FDR_temp, 1, FUN=function(x){x[order(x, decreasing=T)[3]]})
+#     min_FDR<-apply(FDR_temp, 1, FUN=function(x){x[order(x)[3]]})
 #     
-#     
-#     
-#     
-#     ind.Res1<-ind.analysis(data.QC.filtered,ind.method=rep("modt",ndata),nperm=300,tail=ind.tail)
-#     ind.Res2<-ind.cal.ES(data.QC.filtered,paired=rep(F,ndata),nperm=300,miss.tol=0.3)
-#     
-#     MetaDE.Res.ind[['ind.modt']]<-ind.Res1
-#     MetaDE.Res.ind[['ind.ES']]<-ind.Res2
-#     MetaDE.Res[["Fisher"]]<-MetaDE.pvalue(ind.Res1,meta.method=c("Fisher"),asymptotic = T)
-#     MetaDE.Res[["Stouffer"]]=MetaDE.pvalue(ind.Res1,meta.method=c("Stouffer"),asymptotic = T)
-#     MetaDE.Res[["wFisher"]]=MetaDE.pvalue(ind.Res1,meta.method=c("wFisher_sora"),asymptotic = T)
-#     MetaDE.Res[["ordmeta"]]=MetaDE.pvalue(ind.Res1,meta.method=c("ordmeta"),asymptotic = T)
-#     MetaDE.Res[["roP_2"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=2,asymptotic = T)
-#     MetaDE.Res[["roP_4"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=2,asymptotic = T)
-#     MetaDE.Res[["roP_6"]]=MetaDE.pvalue(ind.Res1,meta.method=c("roP"), rth=6,asymptotic = T)
-#     MetaDE.Res[["REM"]]<-MetaDE.ES(ind.Res2, meta.method = "REM", tail=ind.tail)
-#     MetaDE.Res[["FEM"]]<-MetaDE.ES(ind.Res2, meta.method = "FEM", tail=ind.tail)
-#     #MetaDE.Res[["rankProd"]]<-MetaDE.Res.rankProd
-#     
-#     MetaReal[[ind.tail]][[k]]<-MetaDE.Res
-#     MetaReal.ind[[ind.tail]][[k]]<-MetaDE.Res.ind
+#     truede%<>%union(rownames(FDR_temp)[max_FDR<true_gene_threshold])
+#     falsede%<>%union(rownames(FDR_temp)[min_FDR>true_gene_threshold])
 #   }
+#   truegenes[[ind.tail]]$truede<-truede
+#   truegenes[[ind.tail]]$falsede<-falsede
 # }
-# save(MetaReal, file=paste0(res_dir,'MetaDE.Real.Rdata'))
-# 
+# save(truegenes, file=file.path(res_dir,'truegenes_thr_0.01.Rdata'))
 
