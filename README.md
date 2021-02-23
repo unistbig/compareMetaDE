@@ -52,22 +52,31 @@ run run_meta_simul.sh on shell.
 ```
 ./simulation_data_generation.sh 'working directory where Simulation_meta_analysis.R exists' 'input_directory where voom folder locate' 'output_directory'
 ```
- Results will be saved in Meta_Res folder.
+ Results will be saved in "output_directory/Meta_Res" folder.
 
 ### Visualize simulation meta-analysis
 run Visualize_simulation_meta_analysis.sh on shell.
 ```
 ./Visualize_simulation_meta_analysis.sh 'working directory where Visualize_simulation_meta_analysis.R exists' 'input_directory where voom folder locate' 'output_directory'
 ```
- Plots will be saved in Simulation_analysis_plot folder.
+ Plots will be saved in "output_directory/Simulation_analysis_plot" folder.
  
  ## Microarray data analysis
  ### True gene selection
  run true_gene_selection.sh on shell.
 ```
-./true_gene_selection.sh 'working directory where Visualize_simulation_meta_analysis.R exists' 'input_directory where prostate data locate' 'output_directory'
+./true_gene_selection.sh 'working directory where true_gene_selection.R exists' 'input_directory where prostate data locate' 'output_directory' 'true_de_gene_threshold'
 ```
- Plots will be saved in Meta_Res_real folder.
+ Truegenes will be saved in output_directory.
+ Other 6 study and 9 study analysis results will be saved in "output_directory/Meta_Res_real" folder.
+ We used 0.01 of FDR threshold for true de gene selection.
+ 
+ ### real data simulation
+ run real_data_simulation.sh on shell
+ ```
+./real_data_simulation.sh 'working directory where real_data_simulation.R exists' 'input_directory where prostate data locate' 'output_directory' 'true_de_gene_threshold'
+```
+ Results will be saved in "output_directory/Meta_Res_real" folder.
  
  
  Will be updated soon.
