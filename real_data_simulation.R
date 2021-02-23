@@ -101,8 +101,8 @@ for(ind.tail in c('high','low')){
   MetaDE.Res[["FEM"]]<-MetaDE.ES(ind.Res2, meta.method = "FEM", tail=ind.tail)
   MetaDE.Res[["rankProd"]]<-MetaDE.Res.rankProd
   
-  save(MetaDE.Res,file=file.path(res_dir,'Meta_Res_Real',paste0('Real_' ,ndata ,'study_' ,k,'_rep_',tailed,'_tailed_Meta_Res.RData')))
-  save(MetaDE.Res.ind,file=file.path(res_dir,'Meta_Res_Real',paste0('Real_' ,ndata ,'study_' ,k,'_rep_',tailed,'_tailed_Meta_Res_ind.RData')))
+  save(MetaDE.Res,file=file.path(res_dir,'Meta_Res_real',paste0('Real_' ,ndata ,'study_' ,k,'_rep_',tailed,'_tailed_Meta_Res.RData')))
+  save(MetaDE.Res.ind,file=file.path(res_dir,'Meta_Res_real',paste0('Real_' ,ndata ,'study_' ,k,'_rep_',tailed,'_tailed_Meta_Res_ind.RData')))
 }
 
 
