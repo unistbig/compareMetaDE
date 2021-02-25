@@ -78,5 +78,11 @@ run Visualize_simulation_meta_analysis.sh on shell.
 ```
  Results will be saved in "output_directory/Meta_Res_real" folder.
  
+ ### Visualize real data analysis
+ run Visualize_real_simulation_meta_analysis.sh on shell
+ ```
+./Visualize_real_simulation_meta_analysis.sh 'working directory where Visualize_real_simulation_meta_analysis.R exists' 'input_directory1 where real data simulation locate(Meta_Res_real folder we made)' 'input_directory2 where selected true genes locate' 'output_directory' 'true_de_gene_threshold'
+```
+ Results will be saved in "output_directory/Real_study_analysis_plot" folder.
  
- Will be updated soon.
+ 
