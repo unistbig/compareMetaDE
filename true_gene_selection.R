@@ -175,5 +175,5 @@ for(ind.tail in c('high','low')){
   truegenes[[ind.tail]]$truede<-truede
   truegenes[[ind.tail]]$falsede<-falsede
 }
-save(truegenes, file=file.path(res_dir,'truegenes_thr_0.01.Rdata'))
+save(truegenes, file=file.path(res_dir,paste0('truegenes_thr_',true_gene_threshold,'.Rdata')))
 
