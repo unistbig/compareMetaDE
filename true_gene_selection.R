@@ -20,8 +20,8 @@ dir.create(file.path(res_dir,'Meta_Res_real'),showWarnings = F)
 study.names<-c("Welsh","Yu","Lapointe","Varambally","Singh","Wallace","Nanni","Dhanasekaran", "Tomlins")
 prostate.raw<-MetaDE.Read(study.names,skip=rep(1,9),via="txt",matched=T,log=F)
 
-##################################################################################
-#9study
+# ##################################################################################
+# #9study
 prostate.merged<-MetaDE.merge(prostate.raw)
 dim(prostate.merged[[1]][[1]])
 prostate.filtered<-MetaDE.filter(prostate.merged,c(0.3,0.3))
@@ -45,13 +45,13 @@ for(ind.tail in c('high', 'low')){
                  "high" = "right"
   )
   #ndata=length(study.names)
-  
-  
-  
+
+
+
   # start<-Sys.time()
   ind.Res1<-ind.analysis(prostate.filtered,ind.method=rep("modt",ndata),nperm=300,tail=ind.tail,miss.tol = 0.3)
   ind.Res2<-ind.cal.ES(prostate.filtered,paired=rep(F,ndata),nperm=300,miss.tol=0.3)
-  
+
   MetaDE.Res.ind[['ind.modt']]<-ind.Res1
   MetaDE.Res.ind[['ind.ES']]<-ind.Res2
   MetaDE.Res[["Fisher"]]<-MetaDE.pvalue(ind.Res1,meta.method=c("Fisher"),asymptotic = T)
@@ -64,9 +64,9 @@ for(ind.tail in c('high', 'low')){
   MetaDE.Res[["REM"]]<-MetaDE.ES(ind.Res2, meta.method = "REM", tail=ind.tail)
   MetaDE.Res[["FEM"]]<-MetaDE.ES(ind.Res2, meta.method = "FEM", tail=ind.tail)
   MetaDE.Res[["rankProd"]]<-MetaDE.Res.rankProd
-  
-  
-  
+
+
+
   save(MetaDE.Res,file=file.path(res_dir,'Meta_Res_real',paste0('Real_9study',tailed,'_tailed_Meta_Res.RData')))
   save(MetaDE.Res.ind,file=file.path(res_dir,'Meta_Res_real',paste0('Real_9study',tailed,'_tailed_Meta_Res_ind.RData')))
 }
